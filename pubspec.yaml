@@ -1,0 +1,13 @@
+name: flu_cli
+
+environment:
+  sdk: ">=3.8.1 <4.0.0"
+
+dev_dependencies:
+  melos: ^7.0.0-dev.9
+  very_good_analysis: ^9.0.0
+
+workspace:
+  - packages/flu
+
+melos:
