@@ -16,47 +16,63 @@ class CreateCommand extends FluCommand {
   @override
   String get description => 'Create a new Flutter project';
 
-  Versions? _fvmFlutterVersion;
+  late final String _projectName;
+  late final String _orgName;
+  late final Versions? _fvmFlutterVersion;
+  late final bool _useMelos;
 
   String get _flutterCmd =>
       _fvmFlutterVersion != null ? 'fvm flutter' : 'flutter';
 
   String get _dartCmd => _fvmFlutterVersion != null ? 'fvm dart' : 'dart';
 
+  final _verbose = false;
+
   @override
   Future<void> run() async {
-    final projectName = logger.prompt('Project name:').toSnakeCase();
-    if (projectName.trim().isEmpty) {
+    _projectName = logger.prompt('Project name:').toSnakeCase();
+    if (_projectName.trim().isEmpty) {
       return logger.err('Project name cannot be empty');
     }
 
-    final orgName = logger.prompt(
+    _orgName = logger.prompt(
       'Organization name:',
       defaultValue: 'com.example',
     );
 
     _fvmFlutterVersion = await _getFlutterVersion();
 
+    _useMelos = await _configureMelos();
+
     // create flutter project
-    await _createProject(
-      projectName: projectName,
-      orgName: orgName,
-    );
+    await _createProject();
 
     // project root shell
-    final shell = Shell(workingDirectory: './$projectName', verbose: false);
+    final rootShell = Shell(
+      workingDirectory: _projectName,
+      verbose: _verbose,
+    );
+    // flutter app root shell
+    final appShell = _useMelos
+        ? Shell(
+            workingDirectory: '$_projectName/apps/$_projectName',
+            verbose: _verbose,
+          )
+        : rootShell;
 
     // FVM config
     if (_fvmFlutterVersion != null) {
-      await _configureFvm(shell: shell);
+      await _configureFvm(shell: appShell);
     }
 
     // get and upgrade dependencies
-    await _getDependencies(shell: shell);
+    await _getDependencies(shell: appShell);
 
     // dart fix and format
-    await _fixAndFormat(shell: shell);
+    await _fixAndFormat(shell: rootShell);
   }
+
+  bool _isCmdAvailable(String cmd) => whichSync(cmd) != null;
 
   Future<Versions?> _getFlutterVersion() async {
     final useFvm = logger.confirm(
@@ -65,9 +81,9 @@ class CreateCommand extends FluCommand {
     );
     if (!useFvm) return null;
 
-    final shell = Shell(verbose: false);
+    final shell = Shell(verbose: _verbose);
     // install fvm if not installed
-    if (await which('fvm') == null) {
+    if (!_isCmdAvailable('fvm')) {
       final confirmInstall = logger.confirm(
         'FVM is not installed. Do you want to install it?',
       );
@@ -105,18 +121,18 @@ rm install.sh
     );
   }
 
-  Future<void> _createProject({
-    required String projectName,
-    required String orgName,
-  }) async {
-    var createCommand = 'create $projectName --org $orgName --no-pub --empty';
+  Future<void> _createProject() async {
+    var createCommand = 'create $_projectName --org $_orgName --no-pub --empty';
     if (_fvmFlutterVersion case Versions(:final name)) {
       createCommand = 'fvm spawn $name $createCommand';
     } else {
       createCommand = 'flutter $createCommand';
     }
     final progress = logger.progress('Creating project...');
-    await Shell(verbose: false).run(createCommand);
+    await Shell(
+      verbose: _verbose,
+      workingDirectory: _useMelos ? '$_projectName/apps' : null,
+    ).run(createCommand);
     progress.complete('Project created successfully');
   }
 
@@ -153,5 +169,73 @@ $_dartCmd fix --apply
 $_dartCmd format .
 ''');
     progress.complete('Code formatted successfully');
+  }
+
+  Future<bool> _configureMelos() async {
+    final useMelos = logger.confirm('Do you want to use Melos?');
+    if (!useMelos) return false;
+    final shell = Shell(verbose: _verbose);
+
+    // install melos if not installed
+    if (!_isCmdAvailable('melos')) {
+      final confirmInstall = logger.confirm(
+        'Melos is not installed. Do you want to install it?',
+      );
+      if (!confirmInstall) {
+        logger.info('Melos configuration skipped.');
+        return false;
+      }
+      final progress = logger.progress('Installing melos...');
+      await shell.run('$_dartCmd pub global activate melos ^7.0.0-dev.9');
+      progress.complete('Melos installed successfully');
+    }
+
+    final melosVersion = (await shell.run('melos --version')).outText;
+
+    // configure melos
+    final workspaceName = logger.prompt(
+      'Melos workspace name:',
+      defaultValue: _projectName.toPascalCase(),
+    );
+
+    // root pubspec
+    final pubspecFile = await File(
+      '$_projectName/pubspec.yaml',
+    ).create(recursive: true);
+    await pubspecFile.writeAsString('''
+name: $workspaceName
+
+environment:
+  sdk: ">=3.8.1 <4.0.0"
+
+dev_dependencies:
+  melos: ^$melosVersion
+
+# workspace: 
+
+melos:
+''');
+
+    // root .gitignore
+    final gitIgnore = await File(
+      '$_projectName/.gitignore',
+    ).create();
+    await gitIgnore.writeAsString('''
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Dart/Pub related
+**/doc/api/
+.dart_tool/
+.pub-cache/
+.pub/
+/build/
+''');
+
+    await Directory('$_projectName/apps').create(recursive: true);
+    return true;
   }
 }
