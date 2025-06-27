@@ -9,5 +9,10 @@ environment:
 
 dependencies:
   args: ^2.5.0
+  change_case: ^2.2.0
   cli_completion: ^0.5.1
   mason_logger: ^0.3.3
+  process_run: ^1.2.4
+
+executables:
+  flu:
