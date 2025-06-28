@@ -102,6 +102,16 @@ class CreateCommand extends FluCommand {
       await _addPackage(deps: dependencies, devDeps: devDependencies);
       progress.complete('Packages added successfully');
     }
+
+    // post install callbacks
+    final postInstallCallbacks = packages.map((e) => e.postInstall).nonNulls;
+    if (postInstallCallbacks.isNotEmpty) {
+      final progress = logger.progress('Configuring packages...');
+      for (final fn in postInstallCallbacks) {
+        await fn(FlutterApp(_appShell));
+      }
+      progress.complete('Packages configured successfully');
+    }
   }
 
   bool _isCmdAvailable(String cmd) => whichSync(cmd) != null;

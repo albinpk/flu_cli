@@ -1,19 +1,32 @@
 import '../models/package.dart';
 
 /// Network client packages for flutter.
-const Set<Package> networkClientPackages = {
+final Set<Package> networkClientPackages = {
   // http
-  Package(dependencies: {'http'}),
-  Package(dependencies: {'http2'}),
+  const Package(dependencies: {'http'}),
+  const Package(dependencies: {'http2'}),
 
   // dio
-  Package(dependencies: {'dio'}),
+  const Package(dependencies: {'dio'}),
 
   // rhttp
-  Package(dependencies: {'rhttp'}),
+  Package(
+    dependencies: {'rhttp'},
+    postInstall: (app) async {
+      // rhttp import and init in the main function
+      final mainDart = await app.mainFile.readAsLines();
+      mainDart.insert(1, "import 'package:rhttp/rhttp.dart';");
+      final mainLine = mainDart.indexOf('void main() {');
+      mainDart.replaceRange(mainLine, mainLine + 1, [
+        'Future<void> main() async {',
+        '  await Rhttp.init();',
+      ]);
+      await app.mainFile.writeAsString('${mainDart.join('\n')}\n');
+    },
+  ),
 
   // retrofit
-  Package(
+  const Package(
     dependencies: {'retrofit', 'json_annotation'},
     devDependencies: {
       'retrofit_generator',
@@ -23,7 +36,7 @@ const Set<Package> networkClientPackages = {
   ),
 
   // chopper
-  Package(
+  const Package(
     dependencies: {'chopper'},
     devDependencies: {'build_runner', 'chopper_generator'},
   ),
