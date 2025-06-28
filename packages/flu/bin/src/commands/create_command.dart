@@ -81,6 +81,8 @@ class CreateCommand extends FluCommand {
     await _chooseStateManager();
 
     await _chooseNavigator();
+
+    await _chooseNetworkClient();
   }
 
   bool _isCmdAvailable(String cmd) => whichSync(cmd) != null;
@@ -329,5 +331,20 @@ melos:
       devDeps: package.devDependencies,
     );
     progress.complete('Navigator added successfully');
+  }
+
+  Future<void> _chooseNetworkClient() async {
+    final package = logger.chooseOne(
+      'Choose a network client:',
+      choices: [...navigatorPackages, Package.none],
+      display: (choice) => choice.displayName,
+    );
+    if (package.isNone) return;
+    final progress = logger.progress('Adding network client...');
+    await _addPackage(
+      deps: package.dependencies,
+      devDeps: package.devDependencies,
+    );
+    progress.complete('Network client added successfully');
   }
 }
