@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:change_case/change_case.dart';
 import 'package:process_run/process_run.dart';
 
-import '../models/fvm_versions.dart';
+import '../models/models.dart';
 import '../packages/packages.dart';
 import 'flu_command.dart';
 
@@ -23,7 +23,6 @@ class CreateCommand extends FluCommand {
   late final bool _useMelos;
   late final Shell _rootShell;
   late final Shell _appShell;
-  late final bool _useCodegen;
 
   String get _flutterCmd =>
       _fvmFlutterVersion != null ? 'fvm flutter' : 'flutter';
@@ -77,14 +76,9 @@ class CreateCommand extends FluCommand {
 
     await _addCustomAnalyzer();
 
-    _useCodegen = logger.confirm(
-      'Do you want to use code generation?',
-      defaultValue: true,
-    );
+    await _chooseModelGenerator();
 
-    if (_useCodegen) {
-      await _chooseModelGenerator();
-    }
+    await _chooseStateManager();
 
     await _chooseNavigator();
   }
@@ -295,8 +289,8 @@ melos:
 
   Future<void> _chooseModelGenerator() async {
     final package = logger.chooseOne(
-      'Choose a model generator:',
-      choices: modelGeneratorPackages.toList(),
+      'Do you want to use any model generator?',
+      choices: [...modelGeneratorPackages, Package.none],
       display: (choice) => choice.displayName,
     );
     final progress = logger.progress('Adding model generator...');
@@ -307,15 +301,28 @@ melos:
     progress.complete('Model generator added successfully');
   }
 
+  Future<void> _chooseStateManager() async {
+    final package = logger.chooseOne(
+      'Choose a state management package:',
+      choices: [...stateManagementPackages, Package.none],
+      display: (choice) => choice.displayName,
+    );
+    if (package.isNone) return;
+    final progress = logger.progress('Adding state management package...');
+    await _addPackage(
+      deps: package.dependencies,
+      devDeps: package.devDependencies,
+    );
+    progress.complete('State management package added successfully');
+  }
+
   Future<void> _chooseNavigator() async {
     final package = logger.chooseOne(
       'Choose a navigator:',
-      choices: _useCodegen
-          ? navigatorPackages.toList()
-          : navigatorPackages.where((e) => !e.requireCodegen).toList(),
+      choices: [...navigatorPackages, Package.none],
       display: (choice) => choice.displayName,
     );
-    if (package.name == kFlutterNavigator2) return;
+    if (package.isNone) return;
     final progress = logger.progress('Adding navigator...');
     await _addPackage(
       deps: package.dependencies,

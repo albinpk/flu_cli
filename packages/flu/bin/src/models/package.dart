@@ -4,15 +4,15 @@ class Package {
     required this.dependencies,
     this.name,
     this.devDependencies = const {},
-    this.requireCodegen = false,
-    this.isInbuilt = false,
   });
+
+  static const Package none = Package(name: 'None', dependencies: {});
+
+  bool get isNone => this == none;
 
   final Set<String> dependencies;
   final String? name;
   final Set<String> devDependencies;
-  final bool requireCodegen;
-  final bool isInbuilt;
 
   String get displayName => name ?? dependencies.first;
 }
