@@ -5,6 +5,7 @@ import 'package:change_case/change_case.dart';
 import 'package:process_run/process_run.dart';
 
 import '../models/fvm_versions.dart';
+import '../packages/analyzers.dart';
 import 'flu_command.dart';
 
 class CreateCommand extends FluCommand {
@@ -26,7 +27,7 @@ class CreateCommand extends FluCommand {
 
   String get _dartCmd => _fvmFlutterVersion != null ? 'fvm dart' : 'dart';
 
-  final _verbose = false;
+  final bool _verbose = false;
 
   @override
   Future<void> run() async {
@@ -70,6 +71,8 @@ class CreateCommand extends FluCommand {
 
     // dart fix and format
     await _fixAndFormat(shell: rootShell);
+
+    await _addCustomAnalyzer(shell: appShell);
   }
 
   bool _isCmdAvailable(String cmd) => whichSync(cmd) != null;
@@ -237,5 +240,30 @@ melos:
 
     await Directory('$_projectName/apps').create(recursive: true);
     return true;
+  }
+
+  Future<void> _addCustomAnalyzer({required Shell shell}) async {
+    final analyzer = logger.chooseOne(
+      'Choose analyzer:',
+      choices: AnalyzerPackages.values,
+      display: (choice) => choice.name.toSnakeCase(),
+    );
+    // flutter_lints is default
+    if (analyzer == AnalyzerPackages.flutterLints) return;
+
+    final progress = logger.progress('Updating analyzer...');
+    await shell.run('$_flutterCmd pub remove flutter_lints');
+    final analysisOptionsFile = File(
+      '${shell.options.workingDirectory!}/analysis_options.yaml',
+    );
+    if (analyzer != AnalyzerPackages.none) {
+      await shell.run(
+        '$_flutterCmd pub add dev:${analyzer.name.toSnakeCase()}',
+      );
+    }
+    await analysisOptionsFile.writeAsString(
+      '${analyzer.analysisOptionsEntry}\n',
+    );
+    progress.complete('Analyzer updated successfully');
   }
 }
