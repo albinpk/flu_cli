@@ -76,13 +76,32 @@ class CreateCommand extends FluCommand {
 
     await _addCustomAnalyzer();
 
-    await _chooseModelGenerator();
+    final packages = <Package>[
+      ?_choosePackage(modelGeneratorPackages, 'model generator'),
+      ?_choosePackage(stateManagementPackages, 'state management'),
+      ?_choosePackage(navigatorPackages, 'navigator'),
+      ?_choosePackage(networkClientPackages, 'network client'),
+    ];
 
-    await _chooseStateManager();
+    final additionalPackages = logger.chooseAny(
+      'Select any additional packages to include',
+      choices: additionalPackagesNames.toList(),
+    );
 
-    await _chooseNavigator();
+    final dependencies = {
+      ...packages.map((e) => e.dependencies).expand((e) => e),
+      ...additionalPackages,
+    };
+    final devDependencies = {
+      ...packages.map((e) => e.devDependencies).expand((e) => e),
+    };
 
-    await _chooseNetworkClient();
+    // installing dependencies
+    if (dependencies.isNotEmpty || devDependencies.isNotEmpty) {
+      final progress = logger.progress('Adding packages...');
+      await _addPackage(deps: dependencies, devDeps: devDependencies);
+      progress.complete('Packages added successfully');
+    }
   }
 
   bool _isCmdAvailable(String cmd) => whichSync(cmd) != null;
@@ -289,62 +308,12 @@ melos:
     progress.complete('Analyzer updated successfully');
   }
 
-  Future<void> _chooseModelGenerator() async {
+  Package? _choosePackage(Set<Package> packages, String category) {
     final package = logger.chooseOne(
-      'Do you want to use any model generator?',
-      choices: [...modelGeneratorPackages, Package.none],
+      'Select a $category package to install',
+      choices: [...packages, Package.none],
       display: (choice) => choice.displayName,
     );
-    final progress = logger.progress('Adding model generator...');
-    await _addPackage(
-      deps: package.dependencies,
-      devDeps: package.devDependencies,
-    );
-    progress.complete('Model generator added successfully');
-  }
-
-  Future<void> _chooseStateManager() async {
-    final package = logger.chooseOne(
-      'Choose a state management package:',
-      choices: [...stateManagementPackages, Package.none],
-      display: (choice) => choice.displayName,
-    );
-    if (package.isNone) return;
-    final progress = logger.progress('Adding state management package...');
-    await _addPackage(
-      deps: package.dependencies,
-      devDeps: package.devDependencies,
-    );
-    progress.complete('State management package added successfully');
-  }
-
-  Future<void> _chooseNavigator() async {
-    final package = logger.chooseOne(
-      'Choose a navigator:',
-      choices: [...navigatorPackages, Package.none],
-      display: (choice) => choice.displayName,
-    );
-    if (package.isNone) return;
-    final progress = logger.progress('Adding navigator...');
-    await _addPackage(
-      deps: package.dependencies,
-      devDeps: package.devDependencies,
-    );
-    progress.complete('Navigator added successfully');
-  }
-
-  Future<void> _chooseNetworkClient() async {
-    final package = logger.chooseOne(
-      'Choose a network client:',
-      choices: [...navigatorPackages, Package.none],
-      display: (choice) => choice.displayName,
-    );
-    if (package.isNone) return;
-    final progress = logger.progress('Adding network client...');
-    await _addPackage(
-      deps: package.dependencies,
-      devDeps: package.devDependencies,
-    );
-    progress.complete('Network client added successfully');
+    return package.isNone ? null : package;
   }
 }

@@ -1,6 +1,6 @@
 import '../models/package.dart';
 
-/// Navigator packages for flutter.
+/// Network client packages for flutter.
 const Set<Package> networkClientPackages = {
   // http
   Package(dependencies: {'http'}),
