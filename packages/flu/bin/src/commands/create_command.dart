@@ -5,7 +5,7 @@ import 'package:change_case/change_case.dart';
 import 'package:process_run/process_run.dart';
 
 import '../models/fvm_versions.dart';
-import '../packages/analyzers.dart';
+import '../packages/packages.dart';
 import 'flu_command.dart';
 
 class CreateCommand extends FluCommand {
@@ -21,6 +21,9 @@ class CreateCommand extends FluCommand {
   late final String _orgName;
   late final Versions? _fvmFlutterVersion;
   late final bool _useMelos;
+  late final Shell _rootShell;
+  late final Shell _appShell;
+  late final bool _useCodegen;
 
   String get _flutterCmd =>
       _fvmFlutterVersion != null ? 'fvm flutter' : 'flutter';
@@ -49,33 +52,56 @@ class CreateCommand extends FluCommand {
     await _createProject();
 
     // project root shell
-    final rootShell = Shell(
+    _rootShell = Shell(
       workingDirectory: _projectName,
       verbose: _verbose,
     );
     // flutter app root shell
-    final appShell = _useMelos
+    _appShell = _useMelos
         ? Shell(
             workingDirectory: '$_projectName/apps/$_projectName',
             verbose: _verbose,
           )
-        : rootShell;
+        : _rootShell;
 
     // FVM config
     if (_fvmFlutterVersion != null) {
-      await _configureFvm(shell: appShell);
+      await _configureFvm();
     }
 
     // get and upgrade dependencies
-    await _getDependencies(shell: appShell);
+    await _getDependencies();
 
     // dart fix and format
-    await _fixAndFormat(shell: rootShell);
+    await _fixAndFormat();
 
-    await _addCustomAnalyzer(shell: appShell);
+    await _addCustomAnalyzer();
+
+    _useCodegen = logger.confirm(
+      'Do you want to use code generation?',
+      defaultValue: true,
+    );
+
+    if (_useCodegen) {
+      await _chooseModelGenerator();
+    }
+
+    await _chooseNavigator();
   }
 
   bool _isCmdAvailable(String cmd) => whichSync(cmd) != null;
+
+  Future<void> _addPackage({
+    Set<String> deps = const {},
+    Set<String> devDeps = const {},
+  }) async {
+    if (deps.isEmpty && devDeps.isEmpty) return;
+    await _appShell.run(
+      '$_flutterCmd pub add '
+      '${deps.join(' ')} '
+      '${devDeps.map((e) => 'dev:$e').join(' ')}',
+    );
+  }
 
   Future<Versions?> _getFlutterVersion() async {
     final useFvm = logger.confirm(
@@ -139,13 +165,15 @@ rm install.sh
     progress.complete('Project created successfully');
   }
 
-  Future<void> _configureFvm({required Shell shell}) async {
+  Future<void> _configureFvm() async {
     final progress = logger.progress('Configuring FVM...');
-    await shell.run(
+    await _appShell.run(
       'fvm use ${_fvmFlutterVersion!.name} --force --skip-setup --skip-pub-get',
     );
     // adding fvm to .gitignore
-    await File('${shell.options.workingDirectory!}/.gitignore').writeAsString(
+    await File(
+      '${_appShell.options.workingDirectory!}/.gitignore',
+    ).writeAsString(
       '''
 
 # FVM Version Cache
@@ -156,18 +184,18 @@ rm install.sh
     progress.complete('FVM configured successfully');
   }
 
-  Future<void> _getDependencies({required Shell shell}) async {
+  Future<void> _getDependencies() async {
     final progress = logger.progress('Downloading dependencies...');
-    await shell.run('''
+    await _appShell.run('''
 $_flutterCmd pub get
 $_flutterCmd pub upgrade
 ''');
     progress.complete('Dependencies downloaded successfully');
   }
 
-  Future<void> _fixAndFormat({required Shell shell}) async {
+  Future<void> _fixAndFormat() async {
     final progress = logger.progress('Code formatting...');
-    await shell.run('''
+    await _rootShell.run('''
 $_dartCmd fix --apply
 $_dartCmd format .
 ''');
@@ -242,9 +270,9 @@ melos:
     return true;
   }
 
-  Future<void> _addCustomAnalyzer({required Shell shell}) async {
+  Future<void> _addCustomAnalyzer() async {
     final analyzer = logger.chooseOne(
-      'Choose analyzer:',
+      'Choose an analyzer:',
       choices: AnalyzerPackages.values,
       display: (choice) => choice.name.toSnakeCase(),
     );
@@ -252,18 +280,47 @@ melos:
     if (analyzer == AnalyzerPackages.flutterLints) return;
 
     final progress = logger.progress('Updating analyzer...');
-    await shell.run('$_flutterCmd pub remove flutter_lints');
+    await _appShell.run('$_flutterCmd pub remove flutter_lints');
     final analysisOptionsFile = File(
-      '${shell.options.workingDirectory!}/analysis_options.yaml',
+      '${_appShell.options.workingDirectory!}/analysis_options.yaml',
     );
     if (analyzer != AnalyzerPackages.none) {
-      await shell.run(
-        '$_flutterCmd pub add dev:${analyzer.name.toSnakeCase()}',
-      );
+      await _addPackage(devDeps: {analyzer.name.toSnakeCase()});
     }
     await analysisOptionsFile.writeAsString(
       '${analyzer.analysisOptionsEntry}\n',
     );
     progress.complete('Analyzer updated successfully');
+  }
+
+  Future<void> _chooseModelGenerator() async {
+    final package = logger.chooseOne(
+      'Choose a model generator:',
+      choices: modelGeneratorPackages.toList(),
+      display: (choice) => choice.displayName,
+    );
+    final progress = logger.progress('Adding model generator...');
+    await _addPackage(
+      deps: package.dependencies,
+      devDeps: package.devDependencies,
+    );
+    progress.complete('Model generator added successfully');
+  }
+
+  Future<void> _chooseNavigator() async {
+    final package = logger.chooseOne(
+      'Choose a navigator:',
+      choices: _useCodegen
+          ? navigatorPackages.toList()
+          : navigatorPackages.where((e) => !e.requireCodegen).toList(),
+      display: (choice) => choice.displayName,
+    );
+    if (package.name == kFlutterNavigator2) return;
+    final progress = logger.progress('Adding navigator...');
+    await _addPackage(
+      deps: package.dependencies,
+      devDeps: package.devDependencies,
+    );
+    progress.complete('Navigator added successfully');
   }
 }
