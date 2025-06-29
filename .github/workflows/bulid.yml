@@ -1,0 +1,52 @@
+name: build
+
+on:
+  # pull_request:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "**.md"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Flutter SDK
+        uses: kuhnroyal/flutter-fvm-config-action/setup@v3
+        # with:
+        #   path: packages/flu/.fvmrc
+
+      - name: Install dependencies
+        run: flutter pub get
+        working-directory: packages/flu
+
+      - name: Check code format
+        run: dart format --set-exit-if-changed .
+        working-directory: packages/flu
+
+      - name: Analyze
+        run: dart analyze
+        working-directory: packages/flu
+
+      #   - name: Flutter test
+      #     run: flutter test --coverage
+      #     working-directory: packages/flu
+
+      #   - name: Upload coverage to codecov
+      #     uses: codecov/codecov-action@v4
+      #     with:
+      #       token: ${{ secrets.CODECOV_TOKEN }}
+      #       working-directory: packages/flu
+
+      - name: Publish - dry run
+        run: dart pub publish --dry-run
+        working-directory: packages/flu

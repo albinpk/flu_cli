@@ -11,3 +11,4 @@ workspace:
   - packages/flu
 
 melos:
+  repository: https://github.com/albinpk/flu_cli

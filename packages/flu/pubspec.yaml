@@ -1,6 +1,13 @@
 name: flu
-description: Flutter Utility for Developers
+description: >
+  A powerful Flutter CLI tool to scaffold, configure, and bootstrap projects 
+  with FVM, Melos, state management, navigation, model generators, and more.
+
 version: 0.0.1-dev.1
+
+homepage: https://github.com/albinpk/flu_cli
+repository: https://github.com/albinpk/flu_cli
+issue_tracker: https://github.com/albinpk/flu_cli/issues
 
 resolution: workspace
 
@@ -16,3 +23,10 @@ dependencies:
 
 executables:
   flu:
+
+topics:
+  - flutter
+  - cli
+  - project-generator
+  - automation
+  - melos
