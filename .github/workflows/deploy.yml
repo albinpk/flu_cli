@@ -1,0 +1,13 @@
+name: deploy
+
+on:
+  push:
+    tags:
+      - "flu-v[0-9]+.[0-9]+.[0-9]+*"
+
+jobs:
+  publish:
+    uses: albinpk/actions/.github/workflows/dart_pub_publish.yml@v1.2.1
+    secrets: inherit
+    with:
+      working-directory: packages/flu

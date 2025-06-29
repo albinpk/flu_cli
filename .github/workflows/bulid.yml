@@ -1,8 +1,7 @@
 name: build
 
 on:
-  # pull_request:
-  push:
+  pull_request:
     branches:
       - main
     paths-ignore:
@@ -22,8 +21,6 @@ jobs:
 
       - name: Setup Flutter SDK
         uses: kuhnroyal/flutter-fvm-config-action/setup@v3
-        # with:
-        #   path: packages/flu/.fvmrc
 
       - name: Install dependencies
         run: flutter pub get
