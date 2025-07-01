@@ -71,9 +71,6 @@ class CreateCommand extends FluCommand {
     // get and upgrade dependencies
     await _getDependencies();
 
-    // dart fix and format
-    await _fixAndFormat();
-
     await _addCustomAnalyzer();
 
     final packages = <Package>[
@@ -112,6 +109,9 @@ class CreateCommand extends FluCommand {
       }
       progress.complete('Packages configured successfully');
     }
+
+    // dart fix and format
+    await _fixAndFormat();
   }
 
   bool _isCmdAvailable(String cmd) => whichSync(cmd) != null;
