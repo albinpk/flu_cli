@@ -38,6 +38,11 @@ class CreateCommand extends FluCommand {
       return logger.err('Project name cannot be empty');
     }
 
+    final projectDescription = logger.prompt(
+      'Project description:',
+      defaultValue: 'A new Flutter project.',
+    );
+
     _orgName = logger.prompt(
       'Organization name:',
       defaultValue: 'com.example',
@@ -48,7 +53,7 @@ class CreateCommand extends FluCommand {
     _useMelos = await _configureMelos();
 
     // create flutter project
-    await _createProject();
+    await _createProject(description: projectDescription);
 
     // project root shell
     _rootShell = Shell(
@@ -175,7 +180,7 @@ rm install.sh
     );
   }
 
-  Future<void> _createProject() async {
+  Future<void> _createProject({required String description}) async {
     final platforms = ['android', 'ios', 'web', 'linux', 'macos', 'windows'];
     final selectedPlatforms = logger.chooseAny(
       'Select platforms:',
@@ -188,6 +193,7 @@ rm install.sh
     var createCommand =
         'create $_projectName'
         ' --platforms ${selectedPlatforms.join(',')}'
+        ' --description "$description"'
         ' --org $_orgName'
         ' --no-pub'
         ' --empty';
