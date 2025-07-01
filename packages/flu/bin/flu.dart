@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import './src/command_runner.dart';
+import 'package:flu/src/command_runner.dart';
 
 Future<void> main(List<String> args) async {
   var code = 0;
