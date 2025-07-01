@@ -176,7 +176,21 @@ rm install.sh
   }
 
   Future<void> _createProject() async {
-    var createCommand = 'create $_projectName --org $_orgName --no-pub --empty';
+    final platforms = ['android', 'ios', 'web', 'linux', 'macos', 'windows'];
+    final selectedPlatforms = logger.chooseAny(
+      'Select platforms:',
+      choices: platforms,
+      defaultValues: platforms,
+    );
+    if (selectedPlatforms.isEmpty) {
+      return logger.err('No platforms selected');
+    }
+    var createCommand =
+        'create $_projectName'
+        ' --platforms ${selectedPlatforms.join(',')}'
+        ' --org $_orgName'
+        ' --no-pub'
+        ' --empty';
     if (_fvmFlutterVersion case Versions(:final name)) {
       createCommand = 'fvm spawn $name $createCommand';
     } else {
