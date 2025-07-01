@@ -1,11 +1,13 @@
 import 'dart:io';
 
-import 'package:process_run/src/shell.dart';
+import 'package:process_run/process_run.dart';
 
 /// Represents a Flutter app.
 class FlutterApp {
+  /// Creates a new [FlutterApp].
   const FlutterApp(this._shell);
 
+  /// A [Shell] instance pointing to the root directory of the Flutter app.
   final Shell _shell;
 
   /// The root directory of the Flutter app.

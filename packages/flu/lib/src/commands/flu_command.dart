@@ -1,8 +1,9 @@
 import 'package:args/command_runner.dart';
 import 'package:mason_logger/mason_logger.dart';
 
-/// Base class for all commands.
+/// Base class for all `flu` commands.
 abstract class FluCommand extends Command<void> {
+  /// Creates a new [FluCommand].
   FluCommand({required this.logger});
 
   /// The logger used by this command.

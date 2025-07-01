@@ -8,7 +8,9 @@ import '../models/models.dart';
 import '../packages/packages.dart';
 import 'flu_command.dart';
 
+/// `flu create` command.
 class CreateCommand extends FluCommand {
+  /// Creates a new [CreateCommand].
   CreateCommand({required super.logger});
 
   @override

@@ -1,5 +1,8 @@
+// ignore_for_file: public_member_api_docs
+
 import 'dart:convert';
 
+/// A model representing `fvm api list` response.
 class FvmVersions {
   const FvmVersions({
     required this.versions,
@@ -17,6 +20,7 @@ class FvmVersions {
   final List<Versions> versions;
 }
 
+/// A flutter version.
 class Versions {
   const Versions({
     required this.name,
@@ -26,5 +30,6 @@ class Versions {
     name: json['name'] as String,
   );
 
+  /// The name of the version. e.g. `3.32.4`.
   final String name;
 }

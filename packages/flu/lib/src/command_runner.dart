@@ -8,6 +8,7 @@ const executableName = 'flu';
 
 /// A command runner for the `flu` CLI.
 class FluCommandRunner extends CompletionCommandRunner<void> {
+  /// Creates a new [FluCommandRunner].
   FluCommandRunner()
     : _logger = Logger(),
       super(executableName, 'Flutter Utility for Developers') {
