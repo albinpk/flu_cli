@@ -1,3 +1,4 @@
+import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:mason_logger/mason_logger.dart';
 
@@ -8,4 +9,7 @@ abstract class FluCommand extends Command<void> {
 
   /// The logger used by this command.
   final Logger logger;
+
+  /// The [ArgResults] for this command.
+  ArgResults get result => argResults!;
 }
