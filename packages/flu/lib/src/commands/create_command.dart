@@ -5,7 +5,7 @@ import 'package:change_case/change_case.dart';
 import 'package:process_run/process_run.dart';
 
 import '../models/models.dart';
-import '../packages/packages.dart';
+import '../pub_packages/packages.dart';
 import '../services/fvm_service.dart';
 import '../services/melos_service.dart';
 import 'flu_command.dart';
