@@ -21,4 +21,19 @@ class FlutterApp {
 
   /// The `lib/main.dart` file of the Flutter app.
   File get mainFile => File('$_root/lib/main.dart');
+
+  /// The `.gitignore` file of the Flutter app.
+  File get gitIgnoreFile => File('$_root/.gitignore');
+
+  /// Adds give [line] to the `.gitignore` file if it doesn't exist.
+  Future<void> addToGitIgnore(String line) async => addAllToGitIgnore([line]);
+
+  /// Adds multiple lines to the `.gitignore` file if they don't exist.
+  Future<void> addAllToGitIgnore(List<String> lines) async {
+    final gitignoreLines = await gitIgnoreFile.readAsLines();
+    final linesToAdd = lines.where((e) => !gitignoreLines.contains(e)).toList();
+    if (linesToAdd.isEmpty) return;
+    gitignoreLines.add('\n${linesToAdd.join('\n')}\n');
+    await gitIgnoreFile.writeAsString(gitignoreLines.join('\n'));
+  }
 }

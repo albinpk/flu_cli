@@ -133,8 +133,9 @@ class CreateCommand extends FluCommand {
     final postInstallCallbacks = packages.map((e) => e.postInstall).nonNulls;
     if (postInstallCallbacks.isNotEmpty) {
       final progress = logger.progress('Configuring packages...');
+      final flutterApp = FlutterApp(_appShell);
       for (final fn in postInstallCallbacks) {
-        await fn(FlutterApp(_appShell));
+        await fn(flutterApp);
       }
       progress.complete('Packages configured successfully');
     }
