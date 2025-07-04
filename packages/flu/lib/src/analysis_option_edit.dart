@@ -14,7 +14,6 @@ String addCustomLint(String analysisOptionsSource) {
   YamlMap yaml;
   try {
     yaml = loadYaml(analysisOptionsSource) as YamlMap;
-    // ignore: avoid_catches_without_on_clauses
   } catch (e) {
     yaml = YamlMap();
   }

@@ -8,3 +8,4 @@ linter:
 analyzer:
   errors:
     document_ignores: ignore
+    avoid_catches_without_on_clauses: ignore

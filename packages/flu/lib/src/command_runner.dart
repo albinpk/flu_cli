@@ -21,7 +21,6 @@ class FluCommandRunner extends CompletionCommandRunner<void> {
   Future<void> run(Iterable<String> args) async {
     try {
       await runCommand(parse(args));
-      // ignore: avoid_catches_without_on_clauses
     } catch (e) {
       _logger.err(e.toString());
     }
