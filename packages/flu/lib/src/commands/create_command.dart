@@ -42,6 +42,7 @@ class CreateCommand extends FluCommand {
   late final bool _useMelos;
   late final Shell _rootShell;
   late final Shell _appShell;
+  late final FlutterApp _flutterApp;
 
   String get _flutterCmd =>
       _fvmFlutterVersion != null ? 'fvm flutter' : 'flutter';
@@ -92,10 +93,14 @@ class CreateCommand extends FluCommand {
           )
         : _rootShell;
 
+    _flutterApp = FlutterApp(_appShell);
+
     // FVM config
     if (_fvmFlutterVersion != null) {
       await _configureFvm();
     }
+
+    await _setInitialVersion();
 
     // get and upgrade dependencies
     await _getDependencies();
@@ -133,9 +138,8 @@ class CreateCommand extends FluCommand {
     final postInstallCallbacks = packages.map((e) => e.postInstall).nonNulls;
     if (postInstallCallbacks.isNotEmpty) {
       final progress = logger.progress('Configuring packages...');
-      final flutterApp = FlutterApp(_appShell);
       for (final fn in postInstallCallbacks) {
-        await fn(flutterApp);
+        await fn(_flutterApp);
       }
       progress.complete('Packages configured successfully');
     }
@@ -250,6 +254,23 @@ class CreateCommand extends FluCommand {
     final progress = logger.progress('Configuring FVM...');
     await fvmService.use(version: _fvmFlutterVersion!.name);
     progress.complete('FVM configured successfully');
+  }
+
+  Future<void> _setInitialVersion() async {
+    final version = logger.chooseOne(
+      'Choose an initial version for you project:',
+      defaultValue: '0.1.0',
+      choices: const [
+        '0.1.0',
+        '0.0.1',
+        '1.0.0',
+        '0.1.0-dev.1',
+        '0.0.1-dev.1',
+        '1.0.0-dev.1',
+      ],
+    );
+    final flutterApp = FlutterApp(_appShell);
+    await flutterApp.setPubspecVersion(version);
   }
 
   Future<void> _getDependencies() async {

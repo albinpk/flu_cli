@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:process_run/process_run.dart';
+import 'package:yaml_edit/yaml_edit.dart';
 
 /// Represents a Flutter app.
 class FlutterApp {
@@ -35,5 +36,12 @@ class FlutterApp {
     if (linesToAdd.isEmpty) return;
     gitignoreLines.add('\n${linesToAdd.join('\n')}\n');
     await gitIgnoreFile.writeAsString(gitignoreLines.join('\n'));
+  }
+
+  /// Sets the `version` field of the `pubspec.yaml` file to [version].
+  Future<void> setPubspecVersion(String version) async {
+    final pubSource = await pubspecFile.readAsString();
+    final editor = YamlEditor(pubSource)..update(['version'], version);
+    await pubspecFile.writeAsString(editor.toString());
   }
 }
