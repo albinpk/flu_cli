@@ -2,6 +2,7 @@ import 'package:cli_completion/cli_completion.dart';
 import 'package:mason_logger/mason_logger.dart';
 
 import 'commands/create_command.dart';
+import 'version.g.dart';
 
 /// The executable name for the `flu` CLI.
 const executableName = 'flu';
@@ -12,6 +13,11 @@ class FluCommandRunner extends CompletionCommandRunner<void> {
   FluCommandRunner()
     : _logger = Logger(),
       super(executableName, 'Flutter Utility for Developers') {
+    argParser.addFlag(
+      'version',
+      help: 'Print the current version.',
+      negatable: false,
+    );
     addCommand(CreateCommand(logger: _logger));
   }
 
@@ -19,6 +25,8 @@ class FluCommandRunner extends CompletionCommandRunner<void> {
 
   @override
   Future<void> run(Iterable<String> args) async {
+    if (args case ['--version']) return _logger.info(fluVersion);
+
     try {
       await runCommand(parse(args));
     } catch (e) {

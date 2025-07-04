@@ -7,7 +7,7 @@ import 'package:yaml/yaml.dart';
 
 Future<void> main() async {
   final versionPath = p.joinAll(
-    [Directory.current.path, 'packages', 'flu', 'lib', 'version.g.dart'],
+    [Directory.current.path, 'packages', 'flu', 'lib', 'src', 'version.g.dart'],
   );
   print('Updating generated file $versionPath');
   final fluPubspec = p.joinAll([
