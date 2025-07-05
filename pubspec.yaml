@@ -19,4 +19,5 @@ melos:
       hooks:
         preCommit: |
           dart run scripts/generate_version.dart && \
-          git add packages/flu/lib/version.g.dart
+          git add packages/flu/lib/src/version.g.dart
+        post: dart pub publish --dry-run --directory=packages/flu
