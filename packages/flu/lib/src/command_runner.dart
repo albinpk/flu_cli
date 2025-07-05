@@ -1,6 +1,7 @@
 import 'package:cli_completion/cli_completion.dart';
 import 'package:mason_logger/mason_logger.dart';
 
+import 'commands/asset_command.dart';
 import 'commands/create_command.dart';
 import 'version.g.dart';
 
@@ -19,6 +20,7 @@ class FluCommandRunner extends CompletionCommandRunner<void> {
       negatable: false,
     );
     addCommand(CreateCommand(logger: _logger));
+    addCommand(AssetCommand(logger: _logger));
   }
 
   final Logger _logger;
