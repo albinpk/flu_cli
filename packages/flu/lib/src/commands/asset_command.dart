@@ -10,12 +10,19 @@ import 'flu_command.dart';
 class AssetCommand extends FluCommand {
   /// Creates a new [AssetCommand].
   AssetCommand({required super.logger}) {
-    argParser.addOption(
-      _kClassName,
-      abbr: 'n',
-      defaultsTo: 'Assets',
-      help: 'The name of the generated asset class.',
-    );
+    argParser
+      ..addFlag(
+        _kWatch,
+        abbr: 'w',
+        negatable: false,
+        help: 'Watch for changes and re-generate the assets class.',
+      )
+      ..addOption(
+        _kClassName,
+        abbr: 'n',
+        defaultsTo: 'Assets',
+        help: 'The name of the generated asset class.',
+      );
   }
 
   @override
@@ -36,12 +43,24 @@ class AssetCommand extends FluCommand {
 
     final assetsService = FlutterAssetsService(app);
 
-    final assetsPaths = await assetsService.getAssetsPathFromPubspec();
-    if (assetsPaths.isEmpty) {
-      throw Exception('No assets found in pubspec.yaml');
+    if (result.flag(_kWatch)) {
+      await assetsService.listenForChanges(() {
+        _generateAssetFile(service: assetsService);
+      });
+    } else {
+      await _generateAssetFile(service: assetsService);
     }
-    final files = await assetsService.getAssetFiles(paths: assetsPaths);
-    await assetsService.generateAssetClass(
+  }
+
+  Future<void> _generateAssetFile({
+    required FlutterAssetsService service,
+  }) async {
+    final assetsPaths = await service.getAssetsPathFromPubspec();
+    if (assetsPaths.isEmpty) {
+      return logger.warn('No assets found in pubspec.yaml');
+    }
+    final files = await service.getAssetFiles(paths: assetsPaths);
+    await service.generateAssetClass(
       files: files,
       className: result.option(_kClassName)!.toPascalCase(),
     );
@@ -50,4 +69,5 @@ class AssetCommand extends FluCommand {
 
   // options and flags names
   static const _kClassName = 'class-name';
+  static const _kWatch = 'watch';
 }

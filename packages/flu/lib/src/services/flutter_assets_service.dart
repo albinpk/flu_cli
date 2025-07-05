@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:change_case/change_case.dart';
 import 'package:path/path.dart' as p;
+import 'package:watcher/watcher.dart';
 import 'package:yaml/yaml.dart';
 
 import '../models/flutter_app.dart';
@@ -75,6 +77,29 @@ class FlutterAssetsService {
     );
     if (!assetFile.existsSync()) await assetFile.create(recursive: true);
     await assetFile.writeAsString(assetContent.toString());
+  }
+
+  /// Listen pubspec.yaml and asset file changes.
+  /// Invokes [listener] upon change detection.
+  Future<void> listenForChanges(void Function() listener) {
+    // TODO(albin): add throttling
+    final subscriptions = <StreamSubscription<WatchEvent>>[];
+    // need to cancel this?
+    Watcher(app.pubspecFile.path).events.listen((_) async {
+      await Future.wait(subscriptions.map((e) => e.cancel()));
+      subscriptions.clear();
+      final files = await getAssetFiles(
+        paths: await getAssetsPathFromPubspec(),
+      );
+      final directories = files.map((e) => e.parent.path).toSet();
+      for (final directory in directories) {
+        final sub = Watcher(directory).events.listen((_) => listener());
+        subscriptions.add(sub);
+      }
+      listener(); // initial trigger
+    });
+    listener(); // initial trigger
+    return Completer<void>().future; // never completes
   }
 
   static const _generatedFileComment =
