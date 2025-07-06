@@ -1,3 +1,8 @@
+## 0.0.1-dev.3
+
+ - **FEAT**: add `--watch` flag to `asset` command. ([c9da1f5b](https://github.com/albinpk/flu_cli/commit/c9da1f5bcdf673f886c43d00d7fc7f64b8053f3c))
+ - **FEAT**: add `asset` command for generating flutter assets. ([c94cd5be](https://github.com/albinpk/flu_cli/commit/c94cd5be02c91ea1f384f162020cfc10c144e8aa))
+
 ## 0.0.1-dev.2
 
  - **FIX**: add custom_lint to `analysis_option.yaml`. ([66b5365b](https://github.com/albinpk/flu_cli/commit/66b5365b5faf1fa9c934087d79a31dec2cea244d))
