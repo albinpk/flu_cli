@@ -30,7 +30,6 @@ dev_dependencies:
 
 executables:
   flu:
-  flu_gen:
 
 topics:
   - flutter
