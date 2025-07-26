@@ -43,6 +43,7 @@ class GenService {
     // }
 
     await app.shell.run(rustBinaryPath.log('running: '));
+    print('script: ${Platform.script}');
   }
 }
 
