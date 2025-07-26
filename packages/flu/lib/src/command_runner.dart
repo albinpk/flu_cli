@@ -3,6 +3,7 @@ import 'package:mason_logger/mason_logger.dart';
 
 import 'commands/asset_command.dart';
 import 'commands/create_command.dart';
+import 'commands/gen_command.dart';
 import 'version.g.dart';
 
 /// The executable name for the `flu` CLI.
@@ -21,6 +22,7 @@ class FluCommandRunner extends CompletionCommandRunner<void> {
     );
     addCommand(CreateCommand(logger: _logger));
     addCommand(AssetCommand(logger: _logger));
+    addCommand(GenCommand(logger: _logger));
   }
 
   final Logger _logger;

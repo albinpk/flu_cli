@@ -7,3 +7,10 @@
 ## ⏳ Coming soon...
 
 `flu_cli` is under development. Stay tuned!
+
+## TODO
+
+- provider scope
+- go router builder name (build verify package)
+- db
+
