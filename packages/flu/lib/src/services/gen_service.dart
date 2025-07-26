@@ -8,7 +8,7 @@ import '../version.g.dart';
 
 // TODO(albin): add ref / tag
 const _rustBinUrl =
-    'https://github.com/albinpk/flu_cli/blob/gen-dev/packages/flu/bin/rust_dart_gen?raw=true';
+    'https://github.com/albinpk/flu_cli/blob/gen-dev/bin/rust_dart_gen?raw=true';
 
 /// Handle model generation related operations.
 class GenService {
