@@ -30,7 +30,7 @@ dev_dependencies:
 
 executables:
   flu:
-  rust_dart_gen:
+  flu_gen:
 
 topics:
   - flutter
