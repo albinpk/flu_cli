@@ -31,26 +31,25 @@ class GenService {
   Future<void> downloadRustBinary() async {
     final logger = Logger();
     final httpClient = HttpClient();
-    final progress = logger.progress('Downloading binary file');
+    final progress = logger.progress('Downloading executable file');
     try {
       final request = await httpClient.getUrl(Uri.parse(_rustBinUrl));
       final response = await request.close();
-      final file = File(rustBinaryPath);
-      final sink = file.openWrite();
+      final sink = File(rustBinaryPath).openWrite();
       await response.pipe(sink);
       await sink.close();
-      print('mod');
+      // TODO(albin): windows?
       await app.shell.run('chmod +x $rustBinaryPath');
-      print('mod done');
-      progress.complete('Binary file downloaded successfully');
+      progress.complete('Downloaded complete!');
     } catch (e) {
-      progress.fail('Failed to download binary file');
+      progress.fail('Failed to download!');
       rethrow;
     } finally {
       httpClient.close();
     }
   }
 
+  /// Run the flu_gen rust binary.
   Future<void> generate() async {
     if (!hasRustBinary()) {
       try {
@@ -61,11 +60,7 @@ class GenService {
       }
     }
 
-    print(hasRustBinary());
-    print(rustBinaryPath);
-
     await app.shell.run(rustBinaryPath);
-    // print('script: ${Platform.script}');
   }
 }
 
