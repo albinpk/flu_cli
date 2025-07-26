@@ -1,10 +1,14 @@
 import 'dart:io';
 
+import 'package:mason_logger/mason_logger.dart';
 import 'package:path/path.dart' as p;
-import 'package:process_run/process_run.dart';
 
-import '../extensions/logger_extension.dart';
 import '../models/flutter_app.dart';
+import '../version.g.dart';
+
+// TODO(albin): add ref / tag
+const _rustBinUrl =
+    'https://github.com/albinpk/flu_cli/blob/gen-dev/packages/flu/bin/rust_dart_gen?raw=true';
 
 /// Handle model generation related operations.
 class GenService {
@@ -14,36 +18,54 @@ class GenService {
   /// The Flutter app.
   final FlutterApp app;
 
+  /// The path to the flu_gen rust binary.
   String get rustBinaryPath => p.join(
-    p.dirname(p.dirname(whichSync('flu')!)),
-    'global_packages',
-    'flu',
-    'bin',
-    'rust_dart_gen',
+    p.dirname(Platform.script.toFilePath()),
+    'flu_gen-$fluVersion',
   );
 
-  bool hasRustBinary() {
-    return File(rustBinaryPath).existsSync();
-  }
+  /// Whether the flu_gen rust binary is available.
+  bool hasRustBinary() => File(rustBinaryPath).existsSync();
 
-  Future<void> addRustBinary() async {
-    final rustBinFile = File(
-      '/Users/albin/dev/albin/rust/rust_dart_gen/target/release/rust_dart_gen',
-    );
-    if (!rustBinFile.existsSync()) {
-      'Rust binary found at ${rustBinFile.path}'.log();
-      return;
+  /// Download and save the flu_gen rust binary from GitHub.
+  Future<void> downloadRustBinary() async {
+    final logger = Logger();
+    final httpClient = HttpClient();
+    final progress = logger.progress('Downloading binary file');
+    try {
+      final request = await httpClient.getUrl(Uri.parse(_rustBinUrl));
+      final response = await request.close();
+      final file = File(rustBinaryPath);
+      final sink = file.openWrite();
+      await response.pipe(sink);
+      await sink.close();
+      print('mod');
+      await app.shell.run('chmod +x $rustBinaryPath');
+      print('mod done');
+      progress.complete('Binary file downloaded successfully');
+    } catch (e) {
+      progress.fail('Failed to download binary file');
+      rethrow;
+    } finally {
+      httpClient.close();
     }
-    await rustBinFile.copy(rustBinaryPath);
   }
 
   Future<void> generate() async {
-    // if (!hasRustBinary()) {
-    await addRustBinary();
-    // }
+    if (!hasRustBinary()) {
+      try {
+        await downloadRustBinary();
+      } catch (e) {
+        Logger().err(e.toString());
+        return;
+      }
+    }
 
-    await app.shell.run(rustBinaryPath.log('running: '));
-    print('script: ${Platform.script}');
+    print(hasRustBinary());
+    print(rustBinaryPath);
+
+    await app.shell.run(rustBinaryPath);
+    // print('script: ${Platform.script}');
   }
 }
 
