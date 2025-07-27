@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-07-27
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`flu` - `v0.0.1-dev.4`](#flu---v001-dev4)
+
+---
+
+#### `flu` - `v0.0.1-dev.4`
+
+ - **FEAT**: add `flu gen` command. ([299d7a7b](https://github.com/albinpk/flu_cli/commit/299d7a7b6f940951389933e99365aaf83bb91d77))
+
+
 ## 2025-07-06
 
 ### Changes

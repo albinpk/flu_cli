@@ -1,3 +1,7 @@
+## 0.0.1-dev.4
+
+ - **FEAT**: add `flu gen` command. ([299d7a7b](https://github.com/albinpk/flu_cli/commit/299d7a7b6f940951389933e99365aaf83bb91d77))
+
 ## 0.0.1-dev.3
 
  - **FEAT**: add `--watch` flag to `asset` command. ([c9da1f5b](https://github.com/albinpk/flu_cli/commit/c9da1f5bcdf673f886c43d00d7fc7f64b8053f3c))
