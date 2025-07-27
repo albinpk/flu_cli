@@ -15,6 +15,27 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`flu` - `v0.0.1-dev.5`](#flu---v001-dev5)
+
+---
+
+#### `flu` - `v0.0.1-dev.5`
+
+ - **FIX**: rust binary for linux platform. ([28e4e214](https://github.com/albinpk/flu_cli/commit/28e4e214fde6ff5518de620f5c3fa4fb749d07a8))
+
+
+## 2025-07-27
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`flu` - `v0.0.1-dev.4`](#flu---v001-dev4)
 
 ---

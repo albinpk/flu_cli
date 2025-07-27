@@ -1,3 +1,7 @@
+## 0.0.1-dev.5
+
+ - **FIX**: rust binary for linux platform. ([28e4e214](https://github.com/albinpk/flu_cli/commit/28e4e214fde6ff5518de620f5c3fa4fb749d07a8))
+
 ## 0.0.1-dev.4
 
  - **FEAT**: add `flu gen` command. ([299d7a7b](https://github.com/albinpk/flu_cli/commit/299d7a7b6f940951389933e99365aaf83bb91d77))
