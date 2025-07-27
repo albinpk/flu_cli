@@ -7,7 +7,7 @@ import 'package:yaml_edit/yaml_edit.dart';
 /// Represents a Flutter app.
 class FlutterApp {
   /// Creates a new [FlutterApp].
-  const FlutterApp(this._shell);
+  const FlutterApp(this.shell);
 
   /// Get [FlutterApp] from the current directory.
   static FlutterApp? findFromCurrentDirectory() {
@@ -28,10 +28,10 @@ class FlutterApp {
   }
 
   /// A [Shell] instance pointing to the root directory of the Flutter app.
-  final Shell _shell;
+  final Shell shell;
 
   /// The root directory of the Flutter app.
-  Directory get rootDirectory => Directory(_shell.options.workingDirectory!);
+  Directory get rootDirectory => Directory(shell.options.workingDirectory!);
 
   String get _root => rootDirectory.path;
 

@@ -50,7 +50,7 @@ class CreateCommand extends FluCommand {
   String get name => 'create';
 
   @override
-  String get description => 'Create a new Flutter project';
+  String get description => 'Create and configure new Flutter project';
 
   late final String _projectName;
   late final String _orgName;
