@@ -5,11 +5,11 @@ import 'package:path/path.dart' as path;
 import '../models/flutter_app.dart';
 import '../version.g.dart';
 
-const _rustBinMacOsUrl =
-    'https://github.com/albinpk/flu_cli/blob/flu-v$fluVersion/bin/rust_dart_gen?raw=true';
+/// Git reference / version tag.
+const _ref = 'flu-v$fluVersion';
 
-const _rustBinWindowsUrl =
-    'https://github.com/albinpk/flu_cli/blob/flu-v$fluVersion/bin/rust_dart_gen.exe?raw=true';
+final _rustBinUrl =
+    'https://github.com/albinpk/flu_cli/blob/$_ref/bin/rust_dart_gen_${Platform.operatingSystem}?raw=true';
 
 /// Handle model generation related operations.
 class GenService {
@@ -32,9 +32,7 @@ class GenService {
   Future<void> downloadRustBinary() async {
     final httpClient = HttpClient();
     try {
-      final request = await httpClient.getUrl(
-        Uri.parse(Platform.isWindows ? _rustBinWindowsUrl : _rustBinMacOsUrl),
-      );
+      final request = await httpClient.getUrl(Uri.parse(_rustBinUrl));
       final response = await request.close();
       final sink = File(rustBinaryPath).openWrite();
       await response.pipe(sink);
