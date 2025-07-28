@@ -1,7 +1,7 @@
 name: flu_cli
 
 environment:
-  sdk: ">=3.8.1 <4.0.0"
+  sdk: ^3.8.1
 
 dev_dependencies:
   melos: ^7.0.0-dev.9
