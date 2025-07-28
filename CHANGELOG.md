@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-07-28
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`flu` - `v0.0.1-dev.6`](#flu---v001-dev6)
+
+---
+
+#### `flu` - `v0.0.1-dev.6`
+
+ - fix: add support for empty classes and dynamic fields in `flu gen` command
+
+
 ## 2025-07-27
 
 ### Changes
