@@ -7,7 +7,14 @@ import 'flu_command.dart';
 /// `flu gen` command.
 class GenCommand extends FluCommand {
   /// Creates a new [GenCommand].
-  GenCommand({required super.logger});
+  GenCommand({required super.logger}) {
+    argParser.addOption(
+      _kPath,
+      abbr: 'p',
+      defaultsTo: 'lib/**/*.dart',
+      help: 'Path to dart files',
+    );
+  }
 
   @override
   String get name => 'gen';
@@ -39,11 +46,14 @@ class GenCommand extends FluCommand {
 
     final progress = logger.progress('Generating...');
     try {
-      await genService.generate();
+      await genService.generate(path: result.option(_kPath)!);
       progress.complete('Generated successfully!');
     } catch (e) {
       progress.fail('Failed to generate!');
       logger.err(e.toString());
     }
   }
+
+  // options and flags names
+  static const _kPath = 'path';
 }

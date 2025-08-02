@@ -48,7 +48,10 @@ class GenService {
   }
 
   /// Run the flu_gen rust binary.
-  Future<void> generate() async {
-    await app.shell.run(rustBinaryPath);
+  Future<void> generate({required String path}) async {
+    await app.shell.run(
+      '$rustBinaryPath'
+      ' --path $path',
+    );
   }
 }
