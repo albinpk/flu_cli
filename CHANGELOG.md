@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-08-02
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`flu` - `v0.0.1-dev.7`](#flu---v001-dev7)
+
+---
+
+#### `flu` - `v0.0.1-dev.7`
+
+ - **FEAT**: enhance `flu gen` command to accept custom file paths for generation. ([437ab44d](https://github.com/albinpk/flu_cli/commit/437ab44d78a2a815e421c16998d8c40c3945885c))
+ - **DOCS**: update `README.md` with documentation. ([30c367bb](https://github.com/albinpk/flu_cli/commit/30c367bb3c02264ebd62bb02131d35bcbf15f457))
+
+
 ## 2025-07-28
 
 ### Changes

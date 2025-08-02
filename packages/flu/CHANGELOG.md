@@ -1,3 +1,8 @@
+## 0.0.1-dev.7
+
+ - **FEAT**: enhance `flu gen` command to accept custom file paths for generation. ([437ab44d](https://github.com/albinpk/flu_cli/commit/437ab44d78a2a815e421c16998d8c40c3945885c))
+ - **DOCS**: update `README.md` with documentation. ([30c367bb](https://github.com/albinpk/flu_cli/commit/30c367bb3c02264ebd62bb02131d35bcbf15f457))
+
 ## 0.0.1-dev.6
 
  - fix: add support for empty classes and dynamic fields in `flu gen` command
